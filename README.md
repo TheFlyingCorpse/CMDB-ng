@@ -17,6 +17,7 @@ Sources: Scripts / daemons that poll / listen for events to trigger updates.
 # Sources
 In progress:
 - PuppetDB
+
 To be written:
 - Icinga2
 - RackTables
