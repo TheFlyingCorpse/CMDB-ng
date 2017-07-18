@@ -20,14 +20,18 @@ Languages:
 # Sources
 In progress:
 - PuppetDB
+  - Script is done to fetch the data.
+  - Triggering: Idea is to either tail the log on Puppetserver for completions or query the database for completions every X.
+- RackTables
+  - Script is done to fetch the data.
+  - Triggering: Triggers to catch changes, logging to a AuditLog table that will be used to query for changes.
 
 Planned:
-- RackTables
+- VMware vCenter
 - Cisco Prime
 
 To be written:
 - Icinga2
-- VMware vCenter
 - System Center Virtual Machine Manager
 - Active Directory
 - DNS:
