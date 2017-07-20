@@ -32,8 +32,7 @@ try:
   mscursor.execute("SELECT config from utility_scripts where script like 'RackTables' and parameter like 'metafacts'")
   row = mscursor.fetchone()
   metafacts = row['config']
-  #metafacts = ['path','uptime','uptime_seconds','uptime_days','uptime_hours','system_uptime','swapfree','swapfree_mb','memoryfree','memoryfree_mb','memory','mountpoints','load_averages',]
-  object_id = 24
+  object_id = 7
   myparams = [object_id]
   myquery = """SET @object_id = %s;"""
   mycursor.execute(myquery,myparams)
@@ -56,7 +55,20 @@ SELECT a.type,a.name as rkey,av.float_value as rvalue from Object o inner join A
 WHERE a.type = 'float' and o.id = @object_id AND av.float_value
 UNION
 SELECT a.type,a.name as rkey,av.uint_value as rvalue from Object o inner join AttributeValue av ON av.object_id=o.id join Attribute a ON a.id=av.attr_id
-WHERE a.type = 'uint' and o.id = @object_id AND av.uint_value"""
+WHERE a.type = 'uint' and o.id = @object_id AND av.uint_value
+UNION
+SELECT 'relation' as type,concat('parent_',parent_entity_type),parent_entity_id FROM EntityLink WHERE child_entity_id = @object_id
+UNION
+SELECT 'relation' as type,concat('child_',child_entity_type),child_entity_id FROM EntityLink WHERE parent_entity_id = @object_id
+UNION
+SELECT 'relation' as type,concat('parent_',d.dict_value) as parent_entity_objectType,el.parent_entity_id
+FROM EntityLink el, Dictionary d, Object o, Chapter c
+WHERE el.child_entity_id = @object_id AND c.id=d.chapter_id AND c.name = 'ObjectType' AND d.dict_key=o.objtype_id AND el.parent_entity_id = o.id AND d.dict_key = o.objtype_id
+UNION
+SELECT 'relation' as type,concat('child_',d.dict_value) as child_entity_objectType,el.child_entity_id
+FROM EntityLink el, Dictionary d, Object o, Chapter c
+WHERE el.parent_entity_id = @object_id AND c.id=d.chapter_id AND c.name = 'ObjectType' AND d.dict_key=o.objtype_id AND el.child_entity_id = o.id AND d.dict_key = o.objtype_id
+"""
   mycursor.execute(myquery)
   facts = mycursor.fetchall()
   metaresult = {}
